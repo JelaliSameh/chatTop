@@ -12,9 +12,10 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
@@ -39,6 +40,18 @@ public class GlobalExceptionHandler {
                 .body(representation);
     }
 
+    
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public class ResourceNotFoundException extends RuntimeException {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public ResourceNotFoundException(String message) {
+            super(message);
+        }
+    }
 
     @ExceptionHandler({
             IllegalArgumentException.class
@@ -63,18 +76,25 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(representation);
     }
-
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ExceptionRepresentation> handleDataIntegrityViolationException(DataIntegrityViolationException dataIntegrityViolationException){
-        ExceptionRepresentation representation = ExceptionRepresentation.builder()
-                .message(dataIntegrityViolationException.getMessage())
-                .build();
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(representation);
+    
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ExceptionRepresentation> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ExceptionRepresentation.builder()
+                                .message("Database constraint violation")
+                                .source("Database")
+                                .validationErrors(Set.of(ex.getCause().getMessage())) // Message technique
+                                .build()
+                );
+    }
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ExceptionRepresentation> handleDisabledException(DisabledException disabledException){
         ExceptionRepresentation representation = ExceptionRepresentation.builder()
@@ -100,26 +120,24 @@ public class GlobalExceptionHandler {
     
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionRepresentation> handleMethodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException){
-        List<String> errors = methodArgumentNotValidException.getBindingResult()
-                .getAllErrors()
-                .stream()
+    public ResponseEntity<ExceptionRepresentation> handleValidationException(MethodArgumentNotValidException ex) {
+        Set<String> errors = ex.getBindingResult().getAllErrors().stream()
                 .map(error -> {
-                    if (error instanceof FieldError) {
-                        return ((FieldError) error).getDefaultMessage();
-                    } else {
-                        return error.getDefaultMessage();
-                    }
+                    String fieldName = ((FieldError) error).getField();
+                    String errorMessage = error.getDefaultMessage();
+                    return fieldName + ": " + errorMessage;
                 })
-                .collect(Collectors.toList());
-
-        ExceptionRepresentation representation = ExceptionRepresentation.builder()
-                .message(String.join(", ", errors))
-                .build();
+                .collect(Collectors.toSet());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(representation);
+                .body(
+                        ExceptionRepresentation.builder()
+                                .message("Validation error")
+                                .source("Request Body")
+                                .validationErrors(errors)
+                                .build()
+                );
     }
 
 }

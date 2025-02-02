@@ -1,126 +1,90 @@
 package com.chatTop.backend.dto;
-
-import java.util.Date;
 import com.chatTop.backend.entities.Rental;
 
+import com.chatTop.backend.entities.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.*;
+
+import java.util.Date;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
 public class RentalDTO {
 
-     Long id;
-     String name;
-     Double surface;
-     Double price;
-     String picture;
-     String description;
-     Date createdAt;
-     Date updatedAt;
-     Long ownerId;
+    private Long id;
 
-    // Constructeur avec tous les paramètres
-    public RentalDTO(Long id, String name, Double surface, Double price, String picture, 
-                     String description, Date createdAt, Date updatedAt, Long ownerId) {
-        this.id = id;
-        this.name = name;
-        this.surface = surface;
-        this.price = price;
-        this.picture = picture;
-        this.description = description;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.ownerId = ownerId;
-    }
+    @NotBlank(message = "Rental name must not be blank")
+    @Size(min = 1, max = 64, message = "The name must be between 1 and 64 characters long")
+    private String name;
 
-    // Constructeur par défaut
-    public RentalDTO() {}
+    @NotNull(message = "Surface must not be null")
+    @Positive(message = "Surface must be a positive value")
+    private Double surface;
 
-    // Getters et Setters
-    public Long getId() {
-        return id;
-    }
+    @NotNull(message = "Price must not be null")
+    @Positive(message = "Price must be a positive value")
+    private Double price;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private String picture;
 
-    public String getName() {
-        return name;
-    }
+    @Size(max = 2000, message = "Description can be up to 2000 characters long")
+    private String description;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    // Permet de renvoyer l'objet owner (qui est un user) dans le json
+    // @NotNull(message = "Owner must not be null")
+    // private UserDTO owner;
 
-    public Double getSurface() {
-        return surface;
-    }
+    // Permet de renvoyer uniquement l'owner_id dans le json
+    @NotNull(message = "Owner id must not be null")
+    @Positive(message = "Owner id must be a positive value")
+    private Long owner_id;
 
-    public void setSurface(Double surface) {
-        this.surface = surface;
-    }
 
-    public Double getPrice() {
-        return price;
-    }
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    private Date created_at;
 
-    public void setPrice(Double price) {
-        this.price = price;
-    }
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    private Date updated_at;
 
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
-    }
-
-    // Méthode pour convertir une entité Rental en DTO
     public static RentalDTO fromEntity(Rental rental) {
-        if (rental == null) {
-            return null;
-        }
+        return RentalDTO.builder()
+                    .id(rental.getId())
+                    .name(rental.getName())
+                    .surface(rental.getSurface())
+                    .price(rental.getPrice())
+                    .picture(rental.getPicture())
+                    .description(rental.getDescription())
+                    //.owner(UserDTO.fromEntity(rental.getOwner()))
+                    .owner_id(rental.getOwner().getId())
+                    .created_at(rental.getCreated_at())
+                    .updated_at(rental.getUpdated_at())
+                .build();
+    }
 
-        return new RentalDTO(
-            rental.getId(),
-            rental.getName(),
-            rental.getSurface(),
-            rental.getPrice(),
-            rental.getPicture(),
-            rental.getDescription(),
-            rental.getCreatedAt(),
-            rental.getUpdatedAt(),
-            rental.getOwner() != null ? rental.getOwner().getId() : null
-        );
+    public static Rental toEntity(RentalDTO rentalDTO) {
+        return Rental.builder()
+                    .id(rentalDTO.getId())
+                    .name(rentalDTO.getName())
+                    .surface(rentalDTO.getSurface())
+                    .price(rentalDTO.getPrice())
+                    .picture(rentalDTO.getPicture())
+                    .description(rentalDTO.getDescription())
+                    //.owner(UserDTO.toEntity(rentalDTO.getOwner()))
+                    .owner(
+                            User.builder()
+                                    .id(rentalDTO.getOwner_id())
+                                    .build()
+                    )
+                    .created_at(rentalDTO.getCreated_at())
+                    .updated_at(rentalDTO.getUpdated_at())
+                .build();
     }
 }

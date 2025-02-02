@@ -44,6 +44,8 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html").permitAll()
+                        
+                      
                         // Toutes les autres requêtes nécessitent une authentification
                         .anyRequest().authenticated()
                 )

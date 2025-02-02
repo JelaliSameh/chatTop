@@ -1,162 +1,65 @@
 package com.chatTop.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import com.chatTop.backend.entities.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-
-
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
 public class UserDTO {
-     long id;
 
-    @JsonProperty("name")
-     String name;
+    private Long id;
 
-     String email;
+    @NotBlank(message = "User name must not be blank")
+    private String name;
 
-    @JsonProperty("password")
-     String password;
+    @NotBlank(message = "Email must not be blank")
+    @Email(message = "Email is not compliant")
+    private String email;
 
-    @JsonProperty("created_at")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd HH:mm:ss")
-     Date createdAt;
+    @NotBlank(message = "Password must not be blank")
+    @Size(min = 6, max=64, message = "The password must be between 6 and 64 characters long")
+    @JsonIgnore // Cette annotation empêche la sérialisation du mot de passe
+    private String password;
 
-    @JsonProperty("updated_at")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd HH:mm:ss")
-     Date updatedAt;
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    private Date created_at;
 
-    Set<RentalDTO> rentals;
-     Set<MessageDTO> messages;
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    private Date updated_at;
 
-    // Default constructor
-    public UserDTO() {}
-
-    // Full constructor
-    public UserDTO(long id, String name, String email, String password, Date createdAt, Date updatedAt, Set<RentalDTO> rentals, Set<MessageDTO> messages) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.rentals = rentals;
-        this.messages = messages;
+    public static UserDTO fromEntity(User user) {
+        return UserDTO.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .name(user.getName())
+                    .password(user.getPassword())
+                    .created_at(user.getCreated_at())
+                    .updated_at(user.getUpdated_at())
+                .build();
     }
 
-    // Method to convert User to UserDTO
-    
-
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getUsername() {
-		return name;
-	}
-
-	public void setUsername(String username) {
-		this.name = username;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public Date getCreatedAt() {
-		return createdAt;
-	}
-
-
-	public Date getUpdatedAt() {
-		return updatedAt;
-	}
-
-	
-
-	public Set<RentalDTO> getRentals() {
-		return rentals;
-	}
-
-	public void setRentals(Set<RentalDTO> rentals) {
-		this.rentals = rentals;
-	}
-
-	public Set<MessageDTO> getMessages() {
-		return messages;
-	}
-
-	public void setMessages(Set<MessageDTO> messages) {
-		this.messages = messages;
-	}
-
-
-
-	public static UserDTO fromEntity(User user) {
-	    if (user == null) {
-	        return null;
-	    }
-
-	    UserDTO userDTO = new UserDTO();
-	    userDTO.setId(user.getId());
-	    userDTO.setUsername(user.getName());  // Correction de l'attribut
-	    userDTO.setEmail(user.getEmail());
-	    userDTO.setPassword(user.getPassword());
-	    userDTO.setCreatedAt(user.getCreatedAt());
-	    userDTO.setUpdatedAt(user.getUpdatedAt());
-
-	    // Conversion des entités en DTO
-	    userDTO.setRentals(user.getRentals().stream()
-	        .map(rental -> RentalDTO.fromEntity(rental))  // Conversion des entités Rental en RentalDTO
-	        .collect(Collectors.toSet())  // Collecte dans un Set
-	    );
-
-	    userDTO.setMessages(user.getMessages().stream()
-	        .map(message -> MessageDTO.fromEntity(message))  // Conversion des entités Message en MessageDTO
-	        .collect(Collectors.toSet())  // Collecte dans un Set
-	    );
-
-	    return userDTO;
-	}
-
-
-	 void setUpdatedAt(Date updatedAt) {
-		// TODO Auto-generated method stub
-		this.updatedAt=updatedAt;
-	}
-
-	 void setCreatedAt(Date createdAt) {
-		// TODO Auto-generated method stub
-		this.createdAt=createdAt;
-	}
-
-
-
-
-	
-
-
-
+    public static User toEntity(UserDTO userDTO) {
+        return User.builder()
+                    .id(userDTO.getId())
+                    .email(userDTO.getEmail())
+                    .name(userDTO.getName())
+                    .password(userDTO.getPassword())
+                    .created_at(userDTO.getCreated_at())
+                    .updated_at(userDTO.getUpdated_at())
+                .build();
+    }
 }
-

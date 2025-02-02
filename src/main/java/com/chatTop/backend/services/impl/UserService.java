@@ -11,11 +11,13 @@ import com.chatTop.backend.entities.User;
 import com.chatTop.backend.repository.UserRepository;
 import com.chatTop.backend.security.UserSecurity;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.Date;
 import java.util.Optional;
 @Service
 @Validated
-
+@RequiredArgsConstructor
 public class UserService implements UserSecurity {
    @Autowired
 	  UserRepository userRepository;
@@ -44,7 +46,7 @@ public class UserService implements UserSecurity {
         newUser.setEmail(registrationRequest.getEmail());
         newUser.setName(registrationRequest.getName());
         newUser.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-        newUser.setCreatedAt(new Date());
+        newUser.setCreated_at(new Date());
 
         // Enregistrer le nouvel utilisateur dans la base de données
         return userRepository.save(newUser);

@@ -1,15 +1,12 @@
 package com.chatTop.backend.controllers;
 
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.chatTop.backend.dto.RentalDTO;
 import com.chatTop.backend.dto.request.RentalRequest;
 import com.chatTop.backend.dto.response.MessageResponse;
@@ -22,6 +19,7 @@ import com.chatTop.backend.services.impl.RentalService;
 
 import java.io.IOException;
 import java.util.Date;
+
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,12 +28,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Tag(name = "Rentals")
 public class RentalController {
-    @Autowired
-     RentalService rentalService;
-    @Autowired
-      UserSecurity userSecurity;
-    @Autowired
-     JWTService jwtService;
+
+    private final RentalService rentalService;
+    private final UserSecurity userSecurity;
+    private final JWTService jwtService;
 
     @GetMapping
     public ResponseEntity<RentalsListResponse> getRentals() {
@@ -60,17 +56,9 @@ public class RentalController {
 
     @PostMapping
     public ResponseEntity<MessageResponse> createRental(
-            @ModelAttribute @Valid RentalRequest rentalRequest,
-            @RequestPart("picture") MultipartFile picture,  
+            @Valid RentalRequest rentalRequest,
             @RequestHeader("Authorization") String token
     ) {
-    	
-    	   System.out.println("Received token: " + token);
-
-    	    if (token == null || !token.startsWith("Bearer ")) {
-    	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Missing or invalid token"));
-    	    }
-
         // Extraire le token de l'en-tête Authorization
         String jwt = token.substring(7);
         String email = jwtService.extractUsername(jwt);
@@ -85,13 +73,13 @@ public class RentalController {
                     .price(rentalRequest.getPrice())
                     .description(rentalRequest.getDescription())
                     .owner(user.get())
-                    .createdAt(new Date())
-                    .updatedAt(null)
+                    .created_at(new Date())
+                    .updated_at(null)
                     .build();
 
             try {
                 RentalDTO createdRental = RentalDTO.fromEntity(
-                        rentalService.createRental(rental, picture)  // Passez le fichier ici
+                        rentalService.createRental(rental, rentalRequest.getPicture())
                 );
 
                 if (createdRental != null) {
@@ -109,16 +97,16 @@ public class RentalController {
             }
         } else {
             messageResponse.setMessage("Owner not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    messageResponse
+            );
         }
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<MessageResponse> updateRental(
             @PathVariable("id") Integer id,
             @Valid RentalRequest rentalRequest,
-            @RequestPart("picture") MultipartFile picture,  // Modification ici
             @RequestHeader("Authorization") String token
     ) {
         // Extraire le token de l'en-tête Authorization
@@ -130,19 +118,19 @@ public class RentalController {
         MessageResponse messageResponse = new MessageResponse();
 
         if (user.isPresent() && existingRentalDTO.isPresent()) {
-            if (user.get().getId() == (existingRentalDTO.get().getOwnerId())) {
+            if (user.get().getId().equals(existingRentalDTO.get().getOwner_id())) {
                 Rental rental = Rental.builder()
                         .name(rentalRequest.getName())
                         .surface(rentalRequest.getSurface())
                         .price(rentalRequest.getPrice())
                         .owner(user.get())
                         .description(rentalRequest.getDescription())
-                        .updatedAt(new Date())
+                        .updated_at(new Date())
                         .build();
 
                 try {
                     RentalDTO updatedRental = RentalDTO.fromEntity(
-                            rentalService.updateRental(id.longValue(), rental, picture)  // Passez le fichier ici
+                            rentalService.updateRental(id.longValue(), rental, rentalRequest.getPicture())
                     );
 
                     if (updatedRental != null) {
@@ -162,7 +150,7 @@ public class RentalController {
                 messageResponse.setMessage("You are not authorized to update this rental");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(messageResponse);
             }
-        } else {
+        }else{
             messageResponse.setMessage("Resource not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponse);
         }

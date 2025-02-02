@@ -2,98 +2,81 @@ package com.chatTop.backend.dto;
 
 import java.util.Date;
 
+
 import com.chatTop.backend.entities.Message;
+import com.chatTop.backend.entities.Rental;
+import com.chatTop.backend.entities.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-
-
-
-
-
-
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
 public class MessageDTO {
-     long id;
-     String message;
-     Date createdAt;
-     Date updatedAt;
-     RentalDTO rental; // Correction ici (non statique)
+    private Long id;
 
- 
+    // Permet de renvoyer l'objet rental dans le json
+    // @NotNull(message = "Rental must not be null")
+    // private RentalDTO rental;
 
-    public MessageDTO(long id, String message, Date createdAt, Date updatedAt, RentalDTO rental) {
-        this.id = id;
-        this.message = message;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.rental = rental;
+    // Permet de renvoyer uniquement le rental_id dans le json
+    @NotNull(message = "Rental id must not be null")
+    @Positive(message = "Rental id must be a positive value")
+    @JsonProperty("rental_id")
+    private Long rental_id;
+
+    // Permet de renvoyer l'objet user dans le json
+    // @NotNull(message = "User must not be null")
+    // private UserDTO user;
+
+    // Permet de renvoyer uniquement l'user_id dans le json
+    @NotNull(message = "User id must not be null")
+    @Positive(message = "User id must be a positive value")
+    @JsonProperty("user_id")
+    private Long user_id;
+
+    @NotBlank(message = "Message content must not be blank")
+    @Size(max = 2000, message = "Message content can be up to 2000 characters long")
+    private String message;
+
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    private Date created_at;
+
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    private Date updated_at;
+
+    public static MessageDTO fromEntity(Message message){
+        return MessageDTO.builder()
+                    .id(message.getId())
+                    //.rental(RentalDTO.fromEntity(message.getRental()))
+                    //.user(UserDTO.fromEntity(message.getUser()))
+                    .rental_id(message.getRental().getId())
+                    .user_id(message.getUser().getId())
+                    .message(message.getMessage())
+                    .created_at(message.getCreated_at())
+                    .updated_at(message.getUpdated_at())
+                .build();
     }
 
-    public MessageDTO() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public Date getCreatedAt() {
-        return createdAt;
+ // Dans MessageDTO
+    public static Message toEntity(MessageDTO messageDTO, Rental rental, User user) {
+        return Message.builder()
+                .id(messageDTO.getId())
+                .rental(rental)  // Utilisez l'objet Rental complet
+                .user(user)      // Utilisez l'objet User complet
+                .message(messageDTO.getMessage())
+                .created_at(messageDTO.getCreated_at())
+                .updated_at(messageDTO.getUpdated_at())
+                .build();
     }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public RentalDTO getRental() {
-        return rental;
-    }
-
-    public void setRental(RentalDTO rental) {
-        this.rental = rental;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public static MessageDTO fromEntity(Message message) {
-        if (message == null) {
-            return null;
-        }
-
-        // Conversion de Message à MessageDTO
-        MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setId(message.getId());
-        messageDTO.setMessage(message.getMessage());
-        messageDTO.setCreatedAt(message.getCreatedAt());
-        messageDTO.setUpdatedAt(message.getUpdatedAt());
-
-        // Mapper rental si nécessaire
-        messageDTO.setRental(message.getRental() != null ? RentalDTO.fromEntity(message.getRental()) : null);
-
-        return messageDTO;
-    }
-
-
-	public String toEntity(@Valid MessageDTO messageDTO) {
-		// TODO Auto-generated method stub
-		return message;
-	}
 }
