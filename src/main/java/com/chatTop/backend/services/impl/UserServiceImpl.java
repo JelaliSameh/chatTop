@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import com.chatTop.backend.dto.request.RegistrationRequest;
 import com.chatTop.backend.entities.User;
 import com.chatTop.backend.repository.UserRepository;
-import com.chatTop.backend.security.UserSecurity;
+import com.chatTop.backend.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 @Validated
 @RequiredArgsConstructor
-public class UserService implements UserSecurity {
+public class UserServiceImpl implements UserService {
    @Autowired
 	  UserRepository userRepository;
    @Autowired

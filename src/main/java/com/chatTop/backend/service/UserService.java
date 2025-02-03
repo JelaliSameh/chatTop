@@ -1,4 +1,4 @@
-package com.chatTop.backend.security;
+package com.chatTop.backend.service;
 
 import java.util.Optional;
 
@@ -13,7 +13,7 @@ import com.chatTop.backend.entities.User;
 /**
  * Interface définissant les opérations liées à la sécurité des utilisateurs.
  */
-public interface UserSecurity {
+public interface UserService {
 	
 	/**
      * Authentifie un utilisateur en fonction de ses identifiants.

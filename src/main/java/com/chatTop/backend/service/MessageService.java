@@ -1,11 +1,11 @@
-package com.chatTop.backend.security;
+package com.chatTop.backend.service;
 
 import java.util.Optional;
 
 import com.chatTop.backend.entities.Message;
 
 
-public interface MessageSecurity {
+public interface MessageService {
 
     Optional<Message> createMessage(Message message);
 

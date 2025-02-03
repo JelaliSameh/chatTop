@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @Service
 @Validated
-public class RentalService {
+public class RentalServiceImpl {
 
     @Autowired
     RentalRepository rentalRepository;

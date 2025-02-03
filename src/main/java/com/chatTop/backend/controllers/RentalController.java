@@ -13,9 +13,9 @@ import com.chatTop.backend.dto.response.MessageResponse;
 import com.chatTop.backend.dto.response.RentalsListResponse;
 import com.chatTop.backend.entities.Rental;
 import com.chatTop.backend.entities.User;
-import com.chatTop.backend.security.UserSecurity;
-import com.chatTop.backend.services.JWTService;
-import com.chatTop.backend.services.impl.RentalService;
+import com.chatTop.backend.service.UserService;
+import com.chatTop.backend.services.impl.RentalServiceImpl;
+import com.chatTop.backend.util.JWTService;
 
 import java.io.IOException;
 import java.util.Date;
@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 @Tag(name = "Rentals")
 public class RentalController {
 
-    private final RentalService rentalService;
-    private final UserSecurity userSecurity;
+    private final RentalServiceImpl rentalService;
+    private final UserService userSecurity;
     private final JWTService jwtService;
 
     @GetMapping

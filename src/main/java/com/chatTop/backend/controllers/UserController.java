@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.chatTop.backend.dto.UserDTO;
 import com.chatTop.backend.entities.User;
-import com.chatTop.backend.security.UserSecurity;
+import com.chatTop.backend.service.UserService;
 
 
 @RestController
@@ -19,7 +19,7 @@ import com.chatTop.backend.security.UserSecurity;
 @Tag(name = "Users")
 public class UserController {
 
-    private final UserSecurity userSecurity;
+    private final UserService userSecurity;
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<UserDTO>> getUserById(@PathVariable Integer id){

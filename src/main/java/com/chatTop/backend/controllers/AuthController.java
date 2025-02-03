@@ -22,9 +22,10 @@ import com.chatTop.backend.dto.request.RegistrationRequest;
 import com.chatTop.backend.dto.response.AuthResponse;
 import com.chatTop.backend.entities.User;
 import com.chatTop.backend.repository.UserRepository;
-import com.chatTop.backend.services.JWTService;
-import com.chatTop.backend.services.MyUserDetailsService;
-import com.chatTop.backend.services.impl.UserService;
+import com.chatTop.backend.services.impl.UserServiceImpl;
+import com.chatTop.backend.util.JWTService;
+import com.chatTop.backend.util.MyUserDetailsService;
+
 import org.springframework.security.authentication.AuthenticationManager;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +42,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 public class AuthController {
 
     @Autowired
-    private  UserService userService;
+    private  UserServiceImpl userService;
     @Autowired
     private  JWTService jwtService;
     @Autowired

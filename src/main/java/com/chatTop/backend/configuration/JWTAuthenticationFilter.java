@@ -12,8 +12,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.chatTop.backend.services.JWTService;
-import com.chatTop.backend.services.MyUserDetailsService;
+import com.chatTop.backend.util.JWTService;
+import com.chatTop.backend.util.MyUserDetailsService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

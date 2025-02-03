@@ -14,7 +14,7 @@ import com.chatTop.backend.entities.Rental;
 import com.chatTop.backend.entities.User;
 import com.chatTop.backend.repository.RentalRepository;
 import com.chatTop.backend.repository.UserRepository;
-import com.chatTop.backend.security.MessageSecurity;
+import com.chatTop.backend.service.MessageService;
 
 
 @RestController
@@ -22,7 +22,7 @@ import com.chatTop.backend.security.MessageSecurity;
 @RequiredArgsConstructor
 public class MessageController {
 
-    private final MessageSecurity messageSecurity;
+    private final MessageService messageSecurity;
     private final RentalRepository rentalRepository; // Ajoutez ce repository
     private final UserRepository userRepository;     // Ajoutez ce repository
 

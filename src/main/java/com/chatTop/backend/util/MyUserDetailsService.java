@@ -1,4 +1,4 @@
-package com.chatTop.backend.services;
+package com.chatTop.backend.util;
 
 import java.util.ArrayList;
 
