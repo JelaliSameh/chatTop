@@ -56,7 +56,7 @@ public class RentalController {
 
     @PostMapping
     public ResponseEntity<MessageResponse> createRental(
-            @Valid RentalRequest rentalRequest,
+            @Valid  RentalRequest rentalRequest,
             @RequestHeader("Authorization") String token
     ) {
         // Extraire le token de l'en-tête Authorization
